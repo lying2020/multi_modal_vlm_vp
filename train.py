@@ -30,6 +30,8 @@ import trainers.maple
 import trainers.independentVL
 import trainers.vpt
 
+import os
+
 def print_args(args, cfg):
     print("***************")
     print("** Arguments **")
@@ -178,9 +180,24 @@ def main(args):
 
 
 if __name__ == "__main__":
+    
+    current_file_path = __file__
+    # 获取当前文件所在的目录
+    current_dir = os.path.dirname(current_file_path)
+
+    DATA=os.path.join(current_dir, "../", "data")
+    TRAINER="MaPLe"
+    DATASET="imagenet"
+    SEED=1
+    CFG="vit_b16_c2_ep5_batch4_2ctx"
+    SHOTS=16
+    DIR=os.path.join(current_dir, f"output/base2new/train_base/${DATASET}/shots_${SHOTS}/${TRAINER}/${CFG}/seed${SEED}")
+    CONFIG_FILE=os.path.join(current_dir, f"configs/trainers/{TRAINER}/{CFG}.yaml")
+    DATA_CONFIG_FILE=os.path.join(current_dir, f"configs/datasets/{DATASET}.yaml")
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=str, default="", help="path to dataset")
-    parser.add_argument("--output-dir", type=str, default="", help="output directory")
+    parser.add_argument("--root", type=str, default=DATA, help="path to dataset")
+    parser.add_argument("--output-dir", type=str, default=DIR, help="output directory")
     parser.add_argument(
         "--resume",
         type=str,
@@ -188,7 +205,7 @@ if __name__ == "__main__":
         help="checkpoint directory (from which the training resumes)",
     )
     parser.add_argument(
-        "--seed", type=int, default=-1, help="only positive value enables a fixed seed"
+        "--seed", type=int, default=SEED, help="only positive value enables a fixed seed"
     )
     parser.add_argument(
         "--source-domains", type=str, nargs="+", help="source domains for DA/DG"
@@ -200,15 +217,15 @@ if __name__ == "__main__":
         "--transforms", type=str, nargs="+", help="data augmentation methods"
     )
     parser.add_argument(
-        "--config-file", type=str, default="", help="path to config file"
+        "--config-file", type=str, default=CONFIG_FILE, help="path to config file"
     )
     parser.add_argument(
         "--dataset-config-file",
         type=str,
-        default="",
+        default=DATA_CONFIG_FILE,
         help="path to config file for dataset setup",
     )
-    parser.add_argument("--trainer", type=str, default="", help="name of trainer")
+    parser.add_argument("--trainer", type=str, default=f"{TRAINER}", help="name of trainer")
     parser.add_argument("--backbone", type=str, default="", help="name of CNN backbone")
     parser.add_argument("--head", type=str, default="", help="name of head")
     parser.add_argument("--eval-only", action="store_true", help="evaluation only")
