@@ -18,6 +18,22 @@ from clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
 _tokenizer = _Tokenizer()
 
 
+def get_available_gpus():
+    """获取所有可用的 GPU 信息"""
+    import nvidia_smi
+    nvidia_smi.nvmlInit()
+    available_gpus = []
+    deviceCount = nvidia_smi.nvmlDeviceGetCount()
+    for i in range(deviceCount):
+        handle = nvidia_smi.nvmlDeviceGetHandleByIndex(i)
+        info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+        # 计算可用显存比例
+        free_ratio = info.free / info.total
+        if free_ratio > 0.7:  # 如果空闲显存超过 50%，认为该 GPU 可用
+            available_gpus.append(i)
+    nvidia_smi.nvmlShutdown()
+    return available_gpus
+
 def load_clip_to_cpu(cfg):
     backbone_name = cfg.MODEL.BACKBONE.NAME
     url = clip._MODELS[backbone_name]
@@ -256,12 +272,29 @@ class MaPLe(TrainerX):
 
         self.scaler = GradScaler() if cfg.TRAINER.MAPLE.PREC == "amp" else None
 
-        # Note that multi-gpu training could be slow because CLIP's size is
-        # big, which slows down the copy operation in DataParallel
-        device_count = torch.cuda.device_count()
-        if device_count > 1:
-            print(f"Multiple GPUs detected (n_gpus={device_count}), use all of them!")
-            self.model = nn.DataParallel(self.model)
+        # 获取可用的 GPU
+        available_gpus = get_available_gpus()
+        max_gpus = 4  # 最多使用4张卡
+
+        # if len(available_gpus) > 1:
+        #     # 使用前 max_gpus 个可用的 GPU
+        #     device_ids = available_gpus[:max_gpus]
+        #     print(f"Found {len(available_gpus)} available GPUs, using GPU {device_ids} for training")
+        #     # 首先将模型移动到第一个GPU上
+        #     self.device = torch.device(f'cuda:{device_ids[0]}')
+        #     self.model.to(self.device)
+        #     self.model = nn.DataParallel(self.model, device_ids=device_ids)
+        # else:
+        print(f"Using single GPU {available_gpus[0]} for training")
+        self.device = torch.device(f'cuda:{available_gpus[0]}')
+        self.model.to(self.device)
+
+        # # Note that multi-gpu training could be slow because CLIP's size is
+        # # big, which slows down the copy operation in DataParallel
+        # device_count = torch.cuda.device_count()
+        # if device_count > 1:
+        #     print(f"Multiple GPUs detected (n_gpus={device_count}), use all of them!")
+        #     self.model = nn.DataParallel(self.model)
 
     def forward_backward(self, batch):
         image, label = self.parse_batch_train(batch)

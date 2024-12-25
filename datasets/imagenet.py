@@ -29,10 +29,10 @@ class ImageNet(DatasetBase):
         else:
             text_file = os.path.join(self.dataset_dir, "classnames.txt")
             classnames = self.read_classnames(text_file)
-            train = self.read_data(classnames, "train")
+            train = self.read_data(classnames, "train/data")
             # Follow standard practice to perform evaluation on the val set
             # Also used as the val set (so evaluate the last-step model)
-            test = self.read_data(classnames, "val")
+            test = self.read_data(classnames, "val/data")
 
             preprocessed = {"train": train, "test": test}
             with open(self.preprocessed, "wb") as f:
