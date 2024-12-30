@@ -251,7 +251,17 @@ def main(args):
         trainer.train()
 
 
+# from pycallgraph import PyCallGraph
+# from pycallgraph.output import GraphvizOutput
+# from pycallgraph import Config
+# from pycallgraph.output import GraphvizOutput
+
 if __name__ == "__main__":
 
     args = parse_arguments()
     main(args)
+
+    # 使用 pycallgraph 捕获调用关系
+    # graphviz = GraphvizOutput(output_file='callgraph.png')
+    # with PyCallGraph(output=graphviz):
+    #     main(args)
