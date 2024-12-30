@@ -154,33 +154,8 @@ def setup_cfg(args):
     return cfg
 
 
-def main(args):
-    cfg = setup_cfg(args)
-    if cfg.SEED >= 0:
-        print("Setting fixed seed: {}".format(cfg.SEED))
-        set_random_seed(cfg.SEED)
-    setup_logger(cfg.OUTPUT_DIR)
+def parse_arguments():
 
-    if torch.cuda.is_available() and cfg.USE_CUDA:
-        torch.backends.cudnn.benchmark = True
-
-    print_args(args, cfg)
-    print("Collecting env info ...")
-    print("** System info **\n{}\n".format(collect_env_info()))
-
-    trainer = build_trainer(cfg)
-
-    if args.eval_only:
-        trainer.load_model(args.model_dir, epoch=args.load_epoch)
-        trainer.test()
-        return
-
-    if not args.no_train:
-        trainer.train()
-
-
-if __name__ == "__main__":
-    
     current_file_path = __file__
     # 获取当前文件所在的目录
     current_dir = os.path.dirname(current_file_path)
@@ -248,4 +223,35 @@ if __name__ == "__main__":
         help="modify config options using the command-line",
     )
     args = parser.parse_args()
+
+    return args
+
+def main(args):
+    cfg = setup_cfg(args)
+    if cfg.SEED >= 0:
+        print("Setting fixed seed: {}".format(cfg.SEED))
+        set_random_seed(cfg.SEED)
+    setup_logger(cfg.OUTPUT_DIR)
+
+    if torch.cuda.is_available() and cfg.USE_CUDA:
+        torch.backends.cudnn.benchmark = True
+
+    print_args(args, cfg)
+    print("Collecting env info ...")
+    print("** System info **\n{}\n".format(collect_env_info()))
+
+    trainer = build_trainer(cfg)
+
+    if args.eval_only:
+        trainer.load_model(args.model_dir, epoch=args.load_epoch)
+        trainer.test()
+        return
+
+    if not args.no_train:
+        trainer.train()
+
+
+if __name__ == "__main__":
+
+    args = parse_arguments()
     main(args)
