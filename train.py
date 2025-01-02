@@ -162,67 +162,58 @@ def parse_arguments():
 
     DATA=os.path.join(current_dir, "../", "data")
     TRAINER="MaPLe"
-    DATASET="imagenet"
+
+    DATASET_NAME="imagenet"
     SEED=1
+
     CFG="vit_b16_c2_ep5_batch4_2ctx"
     SHOTS=16
-    DIR=os.path.join(current_dir, f"output/base2new/train_base/${DATASET}/shots_${SHOTS}/${TRAINER}/${CFG}/seed${SEED}")
+    LOADEP=5
+    SUB="new"
+
+    COMMON_DIR=f"{DATASET_NAME}/shots_{SHOTS}/{TRAINER}/{CFG}/seed{SEED}"
+    MODEL_DIR=os.path.join(current_dir, f"output/base2new/train_base", COMMON_DIR)
+    # DIR=os.path.join(current_dir, f"output/base2new/train_base", COMMON_DIR)
+    DIR=os.path.join(current_dir, f"output/base2new/test_{SUB}", COMMON_DIR)
+
     CONFIG_FILE=os.path.join(current_dir, f"configs/trainers/{TRAINER}/{CFG}.yaml")
-    DATA_CONFIG_FILE=os.path.join(current_dir, f"configs/datasets/{DATASET}.yaml")
+    DATA_CONFIG_FILE=os.path.join(current_dir, f"configs/datasets/{DATASET_NAME}.yaml")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=str, default=DATA, help="path to dataset")
     parser.add_argument("--output-dir", type=str, default=DIR, help="output directory")
-    parser.add_argument(
-        "--resume",
-        type=str,
-        default="",
-        help="checkpoint directory (from which the training resumes)",
-    )
-    parser.add_argument(
-        "--seed", type=int, default=SEED, help="only positive value enables a fixed seed"
-    )
-    parser.add_argument(
-        "--source-domains", type=str, nargs="+", help="source domains for DA/DG"
-    )
-    parser.add_argument(
-        "--target-domains", type=str, nargs="+", help="target domains for DA/DG"
-    )
-    parser.add_argument(
-        "--transforms", type=str, nargs="+", help="data augmentation methods"
-    )
-    parser.add_argument(
-        "--config-file", type=str, default=CONFIG_FILE, help="path to config file"
-    )
-    parser.add_argument(
-        "--dataset-config-file",
-        type=str,
-        default=DATA_CONFIG_FILE,
-        help="path to config file for dataset setup",
-    )
+    parser.add_argument("--resume", type=str, default="", help="checkpoint directory (from which the training resumes)")
+    parser.add_argument("--seed", type=int, default=SEED, help="only positive value enables a fixed seed")
+    parser.add_argument("--source-domains", type=str, nargs="+", help="source domains for DA/DG")
+    parser.add_argument("--target-domains", type=str, nargs="+", help="target domains for DA/DG")
+    parser.add_argument("--transforms", type=str, nargs="+", help="data augmentation methods")
+    parser.add_argument("--config-file", type=str, default=CONFIG_FILE, help="path to config file")
+    parser.add_argument("--dataset-config-file", type=str, default=DATA_CONFIG_FILE, help="path to config file for dataset setup")
     parser.add_argument("--trainer", type=str, default=f"{TRAINER}", help="name of trainer")
     parser.add_argument("--backbone", type=str, default="", help="name of CNN backbone")
     parser.add_argument("--head", type=str, default="", help="name of head")
     parser.add_argument("--eval-only", action="store_true", help="evaluation only")
-    parser.add_argument(
-        "--model-dir",
-        type=str,
-        default="",
-        help="load model from this directory for eval-only mode",
-    )
-    parser.add_argument(
-        "--load-epoch", type=int, help="load model weights at this epoch for evaluation"
-    )
-    parser.add_argument(
-        "--no-train", action="store_true", help="do not call trainer.train()"
-    )
-    parser.add_argument(
-        "opts",
-        default=None,
-        nargs=argparse.REMAINDER,
-        help="modify config options using the command-line",
-    )
+    parser.add_argument("--model-dir", type=str, default="", help="load model from this directory for eval-only mode")
+    parser.add_argument("--load-epoch", type=int, default=LOADEP, help="load model weights at this epoch for evaluation")
+    parser.add_argument("--no-train", action="store_true", help="do not call trainer.train()")
+    parser.add_argument("opts", default=None, nargs=argparse.REMAINDER, help="modify config options using the command-line")
     args = parser.parse_args()
+
+    default_opts = {
+        "DATASET.NUM_SHOTS": SHOTS,  # Default value for NUM_SHOTS
+        "DATASET.SUBSAMPLE_CLASSES": SUB  # Default value for SUBSAMPLE_CLASSES
+    }
+
+    # Convert opts list to a dictionary for easier manipulation
+    opts_dict = {args.opts[i]: args.opts[i + 1] for i in range(0, len(args.opts), 2)}
+
+    # Add default values if they are not already in opts
+    for key, value in default_opts.items():
+        if key not in opts_dict:
+            opts_dict[key] = value
+
+    # Convert back to list format
+    args.opts = [item for pair in opts_dict.items() for item in pair]
 
     return args
 
@@ -251,10 +242,9 @@ def main(args):
         trainer.train()
 
 
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
-from pycallgraph import Config
-from pycallgraph.output import GraphvizOutput
+from pycallgraph2 import PyCallGraph
+from pycallgraph2.output import GraphvizOutput
+from pycallgraph2 import Config
 
 if __name__ == "__main__":
 
