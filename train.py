@@ -245,13 +245,41 @@ def main(args):
 from pycallgraph2 import PyCallGraph
 from pycallgraph2.output import GraphvizOutput
 from pycallgraph2 import Config
+from pycallgraph2.globbing_filter import GlobbingFilter
 
 if __name__ == "__main__":
 
     args = parse_arguments()
-    # main(args)
+    main(args)
 
-    # 使用 pycallgraph 捕获调用关系
-    graphviz = GraphvizOutput(output_file='callgraph.png')
-    with PyCallGraph(output=graphviz):
+    exit()
+
+    # Add visualization config
+    config = Config()
+    # 可以添加需要跟踪的包名
+    config.trace_filter = GlobbingFilter(
+        include=[
+            'trainers.*', 'datasets.*', 'dassl.*',
+            'clip.*', 'lpclip.*',
+            'main', 'setup_cfg', 'extend_cfg', 'reset_cfg'
+        ],
+        exclude=[
+            'pycallgraph.*', 'argparse.*', 'torch.*', 'os.*', 'sys.*', 'logging.*',
+            'numpy.*', 'pandas.*', 'matplotlib.*', 'scipy.*', 'sklearn.*', 'cv2.*',
+            'PIL.*', 'yacs.*', 'collections.*', 'itertools.*', 'functools.*', 're.*',
+            'json.*', 'time.*', 'datetime.*', 'random.*', 'copy.*', 'pickle.*', 'glob.*',
+            'pathlib.*', 'subprocess.*', 'multiprocessing.*', 'threading.*', 'concurrent.*',
+            'http.*', 'urllib.*', 'socket.*', 'email.*', 'xml.*', 'html.*', 'sqlite3.*',
+            'unittest.*', 'pytest.*', 'mock.*', 'boto3.*', 'requests.*', 'flask.*', 'django.*',
+            'sqlalchemy.*', 'tensorflow.*', 'keras.*', 'torchvision.*', 'transformers.*',
+            'scikit_learn.*', 'h5py.*', 'yaml.*', 'argparse.*', 'collections.*', 'dataclasses.*',
+            'enum.*', 'inspect.*', 'io.*', 'math.*', 'operator.*', 'statistics.*', 'types.*',
+            'uuid.*', 'weakref.*', 'warnings.*', 'zipfile.*', 'zlib.*'
+        ]
+    )
+
+    graphviz = GraphvizOutput()
+    graphviz.output_file = 'call_graph.png'
+
+    with PyCallGraph(output=graphviz, config=config):
         main(args)
