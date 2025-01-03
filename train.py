@@ -163,18 +163,19 @@ def parse_arguments():
     DATA=os.path.join(current_dir, "../", "data")
     TRAINER="MaPLe"
 
-    DATASET_NAME="imagenet"
+    DATASET_NAME="dtd"
     SEED=1
 
     CFG="vit_b16_c2_ep5_batch4_2ctx"
     SHOTS=16
     LOADEP=5
-    SUB="new"
+    SUB="base"
+    # SUB="new"
 
     COMMON_DIR=f"{DATASET_NAME}/shots_{SHOTS}/{TRAINER}/{CFG}/seed{SEED}"
     MODEL_DIR=os.path.join(current_dir, f"output/base2new/train_base", COMMON_DIR)
-    # DIR=os.path.join(current_dir, f"output/base2new/train_base", COMMON_DIR)
-    DIR=os.path.join(current_dir, f"output/base2new/test_{SUB}", COMMON_DIR)
+    DIR=os.path.join(current_dir, f"output/base2new/train_base", COMMON_DIR)
+    # DIR=os.path.join(current_dir, f"output/base2new/test_{SUB}", COMMON_DIR)
 
     CONFIG_FILE=os.path.join(current_dir, f"configs/trainers/{TRAINER}/{CFG}.yaml")
     DATA_CONFIG_FILE=os.path.join(current_dir, f"configs/datasets/{DATASET_NAME}.yaml")
