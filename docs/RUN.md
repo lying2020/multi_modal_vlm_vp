@@ -23,15 +23,15 @@ Below, we provide instructions to train MaPLe on imagenet.
 '''
 base to novel acc, train
  [caltech101(97.7%), food101(91.1%), oxford_flowers(95.0%), oxford_pets(95.4%), sun397(81.1%), 
-  imagenet(74.9%), eurosat(73.4%), ucf101(*), dtd(74.3%), fgvc_aircraft(35.2%), stanford_cars(70.6%)]
+  imagenet(76.9%), eurosat(73.4%), ucf101(*), dtd(74.3%), fgvc_aircraft(35.2%), stanford_cars(70.6%)]
 
 #  结果明显有问题的数据集: 
-[ imagenet(MaPLe: 76.66), eurosat(MaPLe: 94.07%), ucf101(运行报错), dtd(80.36), fgvc_aircraft(MaPLe: 37.44%), stanford_cars(72.94%)]
+[ eurosat(MaPLe: 94.07%), ucf101(运行报错), dtd(80.36), fgvc_aircraft(MaPLe: 37.44%), stanford_cars(72.94%)]
 
 
 base to novel acc, test
  [caltech101(95.3%), food101(91.9%), oxford_flowers(74.0%), oxford_pets(97.1%), sun397(77.9%), 
-  imagenet(77.4%), eurosat(78.1%), ucf101(69.8%), dtd(59.9%), fgvc_aircraft(35.9%), stanford_cars(73.4%)]
+  imagenet(71.2%), eurosat(78.1%), ucf101(69.8%), dtd(59.9%), fgvc_aircraft(35.9%), stanford_cars(73.4%)]
 
 #  结果明显有问题的数据集: 
 [ ucf101(运行报错)]
