@@ -19,7 +19,7 @@ if [ -d "$DIR" ]; then
 else
     echo "Run this job and save the output to ${DIR}"
 
-    python train.py \
+    CUDA_VISIBLE_DEVICES=0 python train.py \
     --root ${DATA} \
     --seed ${SEED} \
     --trainer ${TRAINER} \

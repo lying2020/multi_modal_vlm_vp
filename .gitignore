@@ -4,3 +4,4 @@ output
 nohup.out
 
 tests
+*.log
