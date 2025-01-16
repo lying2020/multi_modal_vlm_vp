@@ -44,9 +44,28 @@ run_xd() {
 
 }
 
+
+# Function to run result commands
+run_result() {
+  for dataset in "${datasets[@]}"; do
+    for seed in "${seeds[@]}"; do
+      echo "Parsing results for dataset: $dataset with seed: $seed"
+      
+      # Execute the Python script for train_base
+      python parse_test_res.py output/base2new/train_base/"$dataset"/shots_16/MaPLe/vit_b16_c2_ep5_batch4_2ctx --test-log || echo "Parsing failed for train_base $dataset with seed $seed, continuing..."
+      
+      # Execute the Python script for test_new
+      python parse_test_res.py output/base2new/test_new/"$dataset"/shots_16/MaPLe/vit_b16_c2_ep5_batch4_2ctx --test-log || echo "Parsing failed for test_new $dataset with seed $seed, continuing..."
+    done
+  done
+}
+
+
 # Main logic to decide which function to run
 if [ -z "$1" ] || [ "$1" == "base2new" ]; then
   run_base2new | tee -a run_base2new.log
-else
+elif [ "$1" == "result" ]; then
+  run_result | tee -a run_result.log
+elif [ "$1" == "xd" ]; then
   run_xd | tee -a run_xd.log
 fi
