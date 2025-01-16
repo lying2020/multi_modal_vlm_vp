@@ -48,15 +48,15 @@ run_xd() {
 # Function to run result commands
 run_result() {
   for dataset in "${datasets[@]}"; do
-    for seed in "${seeds[@]}"; do
-      echo "Parsing results for dataset: $dataset with seed: $seed"
-      
-      # Execute the Python script for train_base
-      python parse_test_res.py output/base2new/train_base/"$dataset"/shots_16/MaPLe/vit_b16_c2_ep5_batch4_2ctx --test-log || echo "Parsing failed for train_base $dataset with seed $seed, continuing..."
-      
-      # Execute the Python script for test_new
-      python parse_test_res.py output/base2new/test_new/"$dataset"/shots_16/MaPLe/vit_b16_c2_ep5_batch4_2ctx --test-log || echo "Parsing failed for test_new $dataset with seed $seed, continuing..."
-    done
+
+    echo "Parsing results for dataset: $dataset"
+
+    # Execute the Python script for train_base
+    python parse_test_res.py output/base2new/train_base/"$dataset"/shots_16/MaPLe/vit_b16_c2_ep5_batch4_2ctx --test-log || echo "Parsing failed for train_base $dataset, continuing..."
+    
+    # Execute the Python script for test_new
+    python parse_test_res.py output/base2new/test_new/"$dataset"/shots_16/MaPLe/vit_b16_c2_ep5_batch4_2ctx --test-log || echo "Parsing failed for test_new $dataset continuing..."
+
   done
 }
 
