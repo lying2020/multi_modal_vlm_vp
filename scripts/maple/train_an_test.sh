@@ -46,7 +46,7 @@ run_xd() {
 
 
 # Function to run result commands
-run_result() {
+run_b2n_result() {
   for dataset in "${datasets[@]}"; do
 
     echo "Parsing results for dataset: $dataset"
@@ -60,12 +60,33 @@ run_result() {
   done
 }
 
+run_xd_result() {
+  for dataset in "${datasets[@]}"; do
+
+    echo "Parsing results for dataset: $dataset"
+
+    # Execute the Python script for train_base
+    python parse_test_res.py output/evaluation/MaPLe/vit_b16_c2_ep5_batch4_2ctx_cross_datasets_16shots/"$dataset" --test-log || echo "Parsing failed for train_base $dataset, continuing..."
+
+  done
+
+  for dataset in "${datasets_xd[@]}"; do
+
+    echo "Parsing results for dataset: $datasets_xd"
+
+    # Execute the Python script for train_base
+    python parse_test_res.py output/evaluation/MaPLe/vit_b16_c2_ep5_batch4_2ctx_cross_datasets_16shots/"$dataset" --test-log || echo "Parsing failed for train_base $dataset, continuing..."
+
+  done
+}
 
 # Main logic to decide which function to run
 if [ -z "$1" ] || [ "$1" == "base2new" ]; then
   run_base2new | tee -a run_base2new.log
-elif [ "$1" == "result" ]; then
-  run_result | tee -a run_result.log
+elif [ "$1" == "b2n_result" ]; then
+  run_b2n_result | tee run_b2n_result.log
 elif [ "$1" == "xd" ]; then
-  run_xd | tee -a run_xd.log
+  run_xd | tee run_xd.log
+elif [ "$1" == "xd_result" ]; then
+  run_xd_result | tee -a run_xd_result.log
 fi
